@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Sobral</string>
     <string name="title_activity_maps">Mapa</string>
+
+    <string-array name="all_places">
+        <item>Sobral</item>
+        <item>Outro Lugar</item>
+    </string-array>
 </resources>
