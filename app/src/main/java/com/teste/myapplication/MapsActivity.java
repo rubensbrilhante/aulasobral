@@ -61,6 +61,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         locationView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         locationView.setSuggestionsAdapter(createAdapter());
+        locationView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionSelect(int position) {
+                return false;
+            }
+
+            @Override
+            public boolean onSuggestionClick(int position) {
+                String[] array = getResources().getStringArray(R.array.all_places);
+                if (position < array.length) {
+                    Toast.makeText(MapsActivity.this, array[position], Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                return false;
+            }
+        });
         locationView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -149,21 +165,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         lerCodigo.setVisibility(View.VISIBLE);
         selectedMarker = marker;
-        return false;
+        return true;
     }
 
     @Override
     public void onMapClick(LatLng latLng) {
         lerCodigo.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == PermissionHelper.MY_PERMISSIONS_REQUEST) {
-
-        }
     }
 
     @Override
