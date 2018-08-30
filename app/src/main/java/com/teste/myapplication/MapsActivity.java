@@ -33,8 +33,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         GoogleMap.OnMarkerClickListener {
 
 
-    private static final LatLng SOBRAL = new LatLng(-3.6880315f, -40.3498383);
-    private static final LatLng OUTRO_LOCAL = new LatLng(-3.6980315f, -40.3487300);
+    private static final LatLng SOBRAL = new LatLng(-3.6880315f,-40.3498383);
+    private static final LatLng THEATRO = new LatLng(-3.6864545, -40.3486882);
+    private static final LatLng MUSEU = new LatLng (-3.688273,-40.350379);
+    private static final LatLng CULTURA = new LatLng(-3.6885119,-40.3501677);
+    private static final LatLng ARCO = new LatLng(-3.6857301,-40.3465508);
+    private static final LatLng ROSARIO = new LatLng(-3.6873917,-40.3540407);
+    private static final LatLng SE = new LatLng(-3.6901018,-40.3487946);
 
     private GoogleMap mMap;
     private View mapView;
@@ -119,14 +124,40 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void addMarkers() {
         mMap.addMarker(new MarkerOptions()
-                .position(SOBRAL)
-                .title("SOBRAL")
-        );
+                               .position(SOBRAL)
+                               .title("SOBRAL")
+                      );
 
         mMap.addMarker(new MarkerOptions()
-                .position(OUTRO_LOCAL)
-                .title("OUTRO_LOCAL")
-        );
+                                .position(THEATRO)
+                                .title("Theatro São João")
+                      );
+
+        mMap.addMarker(new MarkerOptions()
+                                .position(MUSEU)
+                                .title("Museu Dom José")
+                      );
+
+        mMap.addMarker(new MarkerOptions()
+                                .position(CULTURA)
+                                .title("Casa da Cultura")
+                      );
+
+        mMap.addMarker(new MarkerOptions()
+                                .position(ARCO)
+                                .title("Arco de Nossa Senhora de Fátima")
+                      );
+
+        mMap.addMarker(new MarkerOptions()
+                                .position(ROSARIO)
+                                .title("Igreja do Rosário")
+
+                      );
+        mMap.addMarker(new MarkerOptions()
+                                .position(SE)
+                                .title("Igreja da Sé")
+                      );
+
     }
 
     @Override
@@ -136,8 +167,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             addMarkers();
 
             LatLngBounds.Builder boundsBuilder = LatLngBounds.builder()
-                    .include(OUTRO_LOCAL)
-                    .include(SOBRAL);
+                                                             .include(SOBRAL)
+                                                             .include(THEATRO)
+                                                             .include(MUSEU)
+                                                             .include(CULTURA)
+                                                             .include(ARCO)
+                                                             .include(ROSARIO)
+                                                             .include(SE);
 
             mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 150));
         }
