@@ -125,6 +125,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void addMarkers() {
         mMap.addMarker(new MarkerOptions()
                                .position(SOBRAL)
+                            .icon
                                .title("SOBRAL")
                       );
 
