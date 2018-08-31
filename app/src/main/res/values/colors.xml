@@ -2,6 +2,8 @@
 <resources>
     <color name="colorPrimary">#fda501</color>
     <color name="colorPrimaryDark">#9f6903</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="colorazau">#118bf7</color>
+    <color name="colorAccent">#ff4081</color>
+    <color name="colorAzul">#1a95d3</color>
+    <color name="colorVermelha">#e06565</color>
+    <color name="colorVerde">#2ccb71</color>
 </resources>

@@ -16,7 +16,7 @@
 
             <android.support.v7.widget.SearchView
                 android:id="@+id/location_search"
-                android:background="@color/colorPrimary"
+                android:background="@color/colorAzul"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
     </android.support.design.widget.AppBarLayout>
