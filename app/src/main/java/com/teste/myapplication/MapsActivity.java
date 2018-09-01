@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -20,39 +19,41 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.Button;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
-        ViewTreeObserver.OnGlobalLayoutListener,
-        View.OnClickListener,
-        GoogleMap.OnMapClickListener,
-        GoogleMap.OnMarkerClickListener {
+                                                               ViewTreeObserver.OnGlobalLayoutListener,
+                                                               View.OnClickListener,
+                                                               GoogleMap.OnMapClickListener,
+                                                               GoogleMap.OnMarkerClickListener {
 
-
-    private static final LatLng SOBRAL = new LatLng(-3.6880315f,-40.3498383);
+    private static final LatLng SOBRAL = new LatLng(-3.6880315f, -40.3498383);
     private static final LatLng THEATRO = new LatLng(-3.6864545, -40.3486882);
-    private static final LatLng MUSEU = new LatLng (-3.688273,-40.350379);
-    private static final LatLng CULTURA = new LatLng(-3.6885119,-40.3501677);
-    private static final LatLng ARCO = new LatLng(-3.6857301,-40.3465508);
-    private static final LatLng ROSARIO = new LatLng(-3.6873917,-40.3540407);
-    private static final LatLng SE = new LatLng(-3.6901018,-40.3487946);
+    private static final LatLng MUSEU = new LatLng(-3.688273, -40.350379);
+    private static final LatLng CULTURA = new LatLng(-3.6885119, -40.3501677);
+    private static final LatLng ARCO = new LatLng(-3.6857301, -40.3465508);
+    private static final LatLng ROSARIO = new LatLng(-3.6873917, -40.3540407);
+    private static final LatLng SE = new LatLng(-3.6901018, -40.3487946);
 
     private GoogleMap mMap;
     private View mapView;
     private FloatingActionButton lerCodigo;
-    private Marker selectedMarker;
-    private SearchView locationView;
+    private SearchView searchView;
+    private Map<String, Marker> markerList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +62,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        Toolbar toolbar = findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
 //         Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -70,12 +71,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         lerCodigo = findViewById(R.id.ler_codigo);
         lerCodigo.setOnClickListener(this);
 
-
-        locationView = findViewById(R.id.location_search);
+        searchView = findViewById(R.id.location_search);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        locationView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        locationView.setSuggestionsAdapter(createAdapter());
-        locationView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setSuggestionsAdapter(createAdapter());
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
             @Override
             public boolean onSuggestionSelect(int position) {
                 return false;
@@ -83,19 +83,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             @Override
             public boolean onSuggestionClick(int position) {
-                String[] array = getResources().getStringArray(R.array.all_places);
-                if (position < array.length) {
-                    Toast.makeText(MapsActivity.this, array[position], Toast.LENGTH_SHORT).show();
-                    return true;
+                Place[] values = Place.values();
+                if (position < values.length) {
+                    Place place = values[position];
+                    return moveToMarker(place.nome);
                 }
                 return false;
             }
         });
-        locationView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 Log.d("debug", "onQueryTextSubmit: " + query);
-                return false;
+                if (!searchView.isIconified()) {
+                    searchView.setIconified(true);
+                }
+                return moveToMarker(query);
             }
 
             @Override
@@ -104,13 +107,36 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return false;
             }
         });
+    }
 
+    private boolean moveToMarker(String placeName) {
+        if (markerList != null && markerList.containsKey(placeName)) {
+            Marker marker = markerList.get(placeName);
+            marker.showInfoWindow();
+            float zoom = mMap.getCameraPosition().zoom;
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), zoom));
+            hideSoftKeyBoard();
+            return true;
+        }
+        return false;
+    }
+
+    private void hideSoftKeyBoard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+        if(imm.isAcceptingText()) { // verify if the soft keyboard is open
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
     }
 
     public SimpleCursorAdapter createAdapter() {
         String[] columnNames = {"_id", "text"};
         MatrixCursor cursor = new MatrixCursor(columnNames);
-        String[] array = getResources().getStringArray(R.array.all_places);
+        Place[] places = Place.values();
+        String[] array = new String[places.length];
+        for (int i = 0; i < places.length; i++) {
+            array[i] = places[i].nome;
+        }
         String[] temp = new String[2];
         int id = 0;
         for (String item : array) {
@@ -132,41 +158,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void addMarkers() {
-        mMap.addMarker(new MarkerOptions()
-                               .position(SOBRAL)
-                               .title("SOBRAL")
-                      );
+        markerList = new TreeMap<String, Marker>(String.CASE_INSENSITIVE_ORDER);
+        markerList.clear();
+        for (Place p : Place.values()) {
+            Marker marker = mMap.addMarker(createMarkerOptione(p));
+            markerList.put(p.nome, marker);
+        }
+    }
 
-        mMap.addMarker(new MarkerOptions()
-                                .position(THEATRO)
-                                .title("Theatro São João")
-                      );
-
-        mMap.addMarker(new MarkerOptions()
-                                .position(MUSEU)
-                                .title("Museu Dom José")
-                      );
-
-        mMap.addMarker(new MarkerOptions()
-                                .position(CULTURA)
-                                .title("Casa da Cultura")
-                      );
-
-        mMap.addMarker(new MarkerOptions()
-                                .position(ARCO)
-                                .title("Arco de Nossa Senhora de Fátima")
-                      );
-
-        mMap.addMarker(new MarkerOptions()
-                                .position(ROSARIO)
-                                .title("Igreja do Rosário")
-
-                      );
-        mMap.addMarker(new MarkerOptions()
-                                .position(SE)
-                                .title("Igreja da Sé")
-                      );
-
+    public MarkerOptions createMarkerOptione(Place place) {
+        return new MarkerOptions().position(place.latLng).title(place.nome);
     }
 
     @Override
@@ -174,45 +175,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if ((mapView.getWidth() != 0) && (mapView.getHeight() != 0)) {
             mapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             addMarkers();
-
-            LatLngBounds.Builder boundsBuilder = LatLngBounds.builder()
-                                                             .include(SOBRAL)
-                                                             .include(THEATRO)
-                                                             .include(MUSEU)
-                                                             .include(CULTURA)
-                                                             .include(ARCO)
-                                                             .include(ROSARIO)
-                                                             .include(SE);
-
+            LatLngBounds.Builder boundsBuilder = LatLngBounds.builder();
+            for (Place p : Place.values()) {
+                boundsBuilder.include(p.latLng);
+            }
             mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 150));
         }
     }
 
     @Override
     public void onClick(View view) {
-        if (selectedMarker != null) {
-            Intent intent = new Intent(this, ScanActivity.class);
-            LatLng position = selectedMarker.getPosition();
-            String local = selectedMarker.getTitle();
-            intent.putExtra("local", local);
-            intent.putExtra("latitude", position.latitude);
-            intent.putExtra("longitude", position.longitude);
-            startActivity(intent);
-//            finish();
-        } else {
-            lerCodigo.setVisibility(View.GONE);
-        }
+        Intent intent = new Intent(this, ScanActivity.class);
+        startActivity(intent);
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        Toast.makeText(MapsActivity.this,
-                marker.getTitle(),
-                Toast.LENGTH_SHORT).show();
-
-        lerCodigo.setVisibility(View.VISIBLE);
-        selectedMarker = marker;
         marker.showInfoWindow();
+        float zoom = mMap.getCameraPosition().zoom;
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), zoom));
         return true;
     }
 
@@ -225,21 +206,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onResume() {
         super.onResume();
         PermissionHelper.askPermission(this);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     @Override
