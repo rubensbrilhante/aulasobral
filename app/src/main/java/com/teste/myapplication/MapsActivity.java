@@ -260,7 +260,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
                 builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary));
                 CustomTabsIntent customTabsIntent = builder.build();
-                customTabsIntent.launchUrl(this, Uri.parse("http://www.sobral.ce.gov.br/informes/agenda-cultural"));
+                String url = "http://www.sobral.ce.gov.br/informes/agenda-cultural";
+                customTabsIntent.launchUrl(this, Uri.parse(url));
                 return true;
         }
         return super.onOptionsItemSelected(item);

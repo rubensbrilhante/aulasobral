@@ -39,7 +39,9 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
-        <activity android:name=".StartActivity" android:label="Tutorial">
+        <activity
+            android:theme="@style/AppTheme.NoActionBar"
+            android:name=".StartActivity" android:label="Tutorial">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
