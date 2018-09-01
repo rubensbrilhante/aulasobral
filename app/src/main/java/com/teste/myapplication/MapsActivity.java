@@ -184,6 +184,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (selectedMarker != null) {
             Intent intent = new Intent(this, ScanActivity.class);
             LatLng position = selectedMarker.getPosition();
+            String local = selectedMarker.getTitle();
+            intent.putExtra("local", local);
             intent.putExtra("latitude", position.latitude);
             intent.putExtra("longitude", position.longitude);
             startActivity(intent);
@@ -201,6 +203,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         lerCodigo.setVisibility(View.VISIBLE);
         selectedMarker = marker;
+        marker.showInfoWindow();
         return true;
     }
 

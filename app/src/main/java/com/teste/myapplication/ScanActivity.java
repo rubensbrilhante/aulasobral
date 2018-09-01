@@ -1,10 +1,11 @@
 package com.teste.myapplication;
 
 import android.graphics.PointF;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
+import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
+import android.support.customtabs.CustomTabsIntent;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.dlazaro66.qrcodereaderview.QRCodeReaderView;
@@ -12,8 +13,6 @@ import com.dlazaro66.qrcodereaderview.QRCodeReaderView;
 public class ScanActivity extends AppCompatActivity implements QRCodeReaderView.OnQRCodeReadListener {
 
     private QRCodeReaderView qrCodeReaderView;
-    private FloatingActionButton fab;
-    private boolean torchEnabled = false;
     private TextView scanText;
 
     @Override
@@ -21,17 +20,8 @@ public class ScanActivity extends AppCompatActivity implements QRCodeReaderView.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
 
-
         qrCodeReaderView = findViewById(R.id.qrdecoderview);
         scanText = findViewById(R.id.scan_text);
-        fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                torchEnabled = !torchEnabled;
-                qrCodeReaderView.setTorchEnabled(torchEnabled);
-            }
-        });
         qrCodeReaderView.setOnQRCodeReadListener(this);
 
         // Use this function to enable/disable decoding
@@ -41,7 +31,7 @@ public class ScanActivity extends AppCompatActivity implements QRCodeReaderView.
         qrCodeReaderView.setAutofocusInterval(2000L);
 
         // Use this function to enable/disable Torch
-        qrCodeReaderView.setTorchEnabled(torchEnabled);
+//        qrCodeReaderView.setTorchEnabled(torchEnabled);
 
 //        // Use this function to set front camera preview
 //        qrCodeReaderView.setFrontCamera();
@@ -50,14 +40,17 @@ public class ScanActivity extends AppCompatActivity implements QRCodeReaderView.
         qrCodeReaderView.setBackCamera();
     }
 
-    // Called when a QR is decoded
-    // "text" : the text encoded in QR
-    // "points" : points where QR control points are placed in View
     @Override
-    public void onQRCodeRead(String text, PointF[] points) {
-//        resultTextView.setText(text);
-            scanText.setText(text);
-
+    public void onQRCodeRead(String url, PointF[] points) {
+        if (url.startsWith("http//") || url.startsWith("https://")) {
+            scanText.setText(null);
+            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+            builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary));
+            CustomTabsIntent customTabsIntent = builder.build();
+            customTabsIntent.launchUrl(this, Uri.parse(url));
+        } else {
+            scanText.setText("Não entendemos esse código: " + url);
+        }
     }
 
     @Override
