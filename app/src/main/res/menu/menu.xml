@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/agenda"
+        android:tooltipText="Agenda"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_calendario"
+        android:title="Agenda"/>
+    <item android:id="@+id/ajuda"
+        app:showAsAction="ifRoom"
+        android:tooltipText="Ajuda"
+        android:icon="@drawable/ic_ajuda"
+        android:title="Ajuda"/>
+</menu>

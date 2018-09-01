@@ -10,15 +10,22 @@
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
+        android:background="@color/colorAzul"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
             <android.support.v7.widget.SearchView
                 android:id="@+id/location_search"
-                android:background="@color/colorAzul"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent"
+                />
+        </android.support.v7.widget.Toolbar>
+
     </android.support.design.widget.AppBarLayout>
 
     <android.support.constraint.ConstraintLayout
@@ -34,17 +41,18 @@
             android:layout_height="match_parent"
             />
 
-        <Button
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/ler_codigo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="8dp"
-            tools:visibility="visible"
-            android:visibility="gone"
-            android:text="ler código"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_camera"
+            android:visibility="visible"
+            app:fabSize="normal"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            />
     </android.support.constraint.ConstraintLayout>
 
 </android.support.design.widget.CoordinatorLayout>
