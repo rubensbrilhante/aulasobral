@@ -65,7 +65,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
-        android:text="para voce desbravar Sobral"
+        android:text="para você desbravar Sobral"
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="18sp"
